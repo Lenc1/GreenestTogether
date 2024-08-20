@@ -1,0 +1,48 @@
+name: local_app
+description: "A new test version"
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  permission_handler: ^11.3.1
+  amap_flutter_map: ^3.0.0
+  amap_flutter_location: ^3.0.0
+  amap_flutter_base: ^3.0.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_slidable: ^3.1.1
+  dio: ^5.5.0+1
+  url_launcher: ^6.3.0
+  flutter_speed_dial: ^7.0.0
+  image_picker: ^1.1.2
+  flutter_svg: ^2.0.10+1
+  google_fonts: ^6.2.1
+  pretty_dio_logger: ^1.4.0
+  cupertino_icons: ^1.0.6
+  flutter_native_splash: ^2.4.1
+  material_color_utilities: ^0.8.0
+  get: ^4.6.6
+  path_provider: ^2.1.4
+  image: ^4.2.0
+  shared_preferences: ^2.3.2
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+
+
+  uses-material-design: true
+flutter_intl:
+  enabled: true
+
