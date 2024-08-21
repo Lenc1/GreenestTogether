@@ -126,10 +126,10 @@ class _MyHomePageState extends State<MyHomePage> {
               width: 100,
               child: ClipOval(
                 child: Obx(
-                  () => Image.network(
+                  () => Image( image:
                     GlobalService.to.isDarkModel
-                        ? 'https://cdn.luogu.com.cn/upload/image_hosting/6pmuruan.png'
-                        : 'https://cdn.luogu.com.cn/upload/image_hosting/o5dkrkgs.png',
+                        ? const AssetImage('assets/images/darkcat.png')
+                        : const AssetImage('assets/images/logo.png'),
                     fit: BoxFit.cover, // 图片覆盖整个区域
                   ),
                 ),

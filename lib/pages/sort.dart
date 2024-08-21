@@ -161,7 +161,7 @@ class _SortPageState extends State<SortPage> {
           await MultipartFile.fromFile(_imageup!.path, filename: 'upload.jpg'),
     });
 
-    String url = 'http://47.99.103.135:5000'; // 服务器地址和端点,更换服务器时修改
+    String url = 'http://lss.howiehz.top:41001/'; // 服务器地址和端点,更换服务器时修改
     try {
       print("发送 POST 请求到: $url");
       var response = await dio.post(
@@ -362,7 +362,7 @@ class _SortPageState extends State<SortPage> {
                         fontSize: 20,
                         color: Colors.black87),
                   ),
-                if (_result == '可回收垃圾')
+                if (_result == '可回收垃圾'||_result=='Recycle')
                   Text(
                     '$_result',
                     style: const TextStyle(
@@ -370,7 +370,7 @@ class _SortPageState extends State<SortPage> {
                         fontSize: 20,
                         color: Colors.green),
                   ),
-                if (_result == '不可回收垃圾')
+                if (_result == '不可回收垃圾'|| _result =='Organic')
                   Text(
                     '$_result',
                     style: const TextStyle(

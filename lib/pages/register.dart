@@ -1,36 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';  // 用于使用 Obx
+import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-import 'package:local_app/pages/quiz/quiz_menu.dart';
-import 'package:local_app/pages/register.dart';
 import 'dart:convert';
-import '../theme/global.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final RxString errorMessage = ''.obs; // 用于显示错误信息
   bool isLoading = false; // 用于加载指示器
-
   final Dio dio = Dio(BaseOptions(
     baseUrl: 'http://192.168.110.159:5000/api',
-    connectTimeout: Duration(seconds: 30),
-    receiveTimeout: Duration(seconds: 30),
-    sendTimeout: Duration(seconds: 30),
-    followRedirects: true,
-    validateStatus: (status) => status! < 500,
+    connectTimeout: Duration(seconds: 20),
+    receiveTimeout: Duration(seconds: 20),
   ));
 
-  void _login() async {
+  void _register() async {
     String username = usernameController.text;
     String password = passwordController.text;
+    String email = emailController.text;
 
     if (username.isEmpty || password.isEmpty) {
       errorMessage.value = "用户名或密码不能为空";
@@ -45,20 +40,16 @@ class _LoginPageState extends State<LoginPage> {
     Map<String, dynamic> data = {
       "username": username,
       "password": password,
+      "email": email,
     };
 
     try {
       // 发送POST请求到服务器
-      print(username);
-      print(password);
+      print("发送注册请求");
       print(json.encode(data));
-
       final response = await dio.post(
-        '/login', // 这里的路径将与 baseUrl 结合
+        '/register',
         data: json.encode(data),
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-        ),
       );
 
       print('Response: ${response.data}');
@@ -66,32 +57,30 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = false;
       });
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final responseData = response.data;
         if (responseData['success']) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const QuizMenuPage()));
-          errorMessage.value = "登录成功！";
+          errorMessage.value = "注册成功！请登录。";
+          Navigator.pop(context);  // 注册成功后返回登录页面
         } else {
-          errorMessage.value = responseData['message'] ?? "用户名或密码错误";
+          errorMessage.value = responseData['message'] ?? "注册失败";
         }
+      } else if (response.statusCode == 409) {
+        errorMessage.value = "用户名已存在";
       } else {
         errorMessage.value = "服务器错误，请稍后再试";
       }
     } on DioException catch (e) {
-      print('Dio Error: ${e.message}');
+      print('Dio Error: ${e.response}');
       setState(() {
         isLoading = false;
       });
-
       if (e.response != null) {
         errorMessage.value = e.response?.data['message'] ?? "服务器错误，请稍后再试";
       } else {
         errorMessage.value = "网络错误，请检查您的连接";
       }
     } catch (e) {
-      print('Unknown Error: $e');
       setState(() {
         isLoading = false;
       });
@@ -102,42 +91,30 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("")),
+      appBar: AppBar(
+        title: const Text("注册"),
+      ),
       body: Padding(
-        padding: EdgeInsets.all(0),
+        padding: const EdgeInsets.all(0),
         child: ListView(
           children: <Widget>[
             const SizedBox(height: 60),
             Container(
               alignment: Alignment.topLeft,
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              child: Obx(
-                    () => Text(
-                  "欢迎登录",
-                  style: TextStyle(
-                    color: GlobalService.to.isDarkModel ? Colors.white : Color(0xFF2E7D32),
-                    fontWeight: FontWeight.w500,
-                    fontSize: 30,
-                  ),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Text(
+                "创建账户",
+                style: TextStyle(
+                  color: Colors.green[800],
+                  fontWeight: FontWeight.w500,
+                  fontSize: 30,
                 ),
               ),
             ),
             const SizedBox(height: 40),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              alignment: Alignment.bottomRight,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RegisterPage()));
-                },
-                child: Text("没有账户？点击注册"),
-              ),
-            ),
-            Container(
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25), // 设置圆角半径
               ),
@@ -154,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 20),
             Container(
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25), // 设置圆角半径
               ),
@@ -170,43 +147,50 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 20),
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25), // 设置圆角半径
+              ),
+              child: TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25), // 与 Container 的圆角一致
+                  ),
+                  labelText: '  邮箱（可选）',
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
             Obx(
                   () => errorMessage.value.isNotEmpty
                   ? Container(
                 alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: 30),
+                padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: Text(
                   errorMessage.value,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               )
-                  : SizedBox.shrink(),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              alignment: Alignment.topLeft,
-              child: TextButton(
-                onPressed: () {
-                  // 忘记密码的逻辑
-                },
-                child: Text('忘记密码？'),
-              ),
+                  : const SizedBox.shrink(),
             ),
             Container(
               alignment: Alignment.centerRight,
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               child: ElevatedButton(
-                onPressed: isLoading ? null : _login,
+                onPressed: isLoading ? null : _register,
                 child: isLoading
                     ? const SizedBox(
-                  width: 24, // 设置加载动画的宽度
+                  width: 24,  // 设置加载动画的宽度
                   height: 24, // 设置加载动画的高度
                   child: CircularProgressIndicator(
                     color: Colors.white,
-                    strokeWidth: 2.0, // 设置加载动画的线条宽度
+                    strokeWidth: 2.0,  // 设置加载动画的线条宽度
                   ),
                 )
-                    : Icon(Icons.arrow_forward_rounded),
+                    : const Text('注册'),
               ),
             ),
           ],
