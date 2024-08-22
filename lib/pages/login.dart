@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';  // 用于使用 Obx
+import 'package:get/get.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_app/main.dart';
 import 'package:local_app/pages/quiz/quiz_menu.dart';
 import 'package:local_app/pages/register.dart';
-import 'dart:convert';
+import 'package:local_app/pages/auth_service.dart';
 import '../theme/global.dart';
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,15 +21,55 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final RxString errorMessage = ''.obs; // 用于显示错误信息
   bool isLoading = false; // 用于加载指示器
+  late final FlutterSecureStorage secureStorage;
+  late final Dio dio;
 
-  final Dio dio = Dio(BaseOptions(
-    baseUrl: 'http://192.168.110.159:5000/api',
-    connectTimeout: Duration(seconds: 30),
-    receiveTimeout: Duration(seconds: 30),
-    sendTimeout: Duration(seconds: 30),
-    followRedirects: true,
-    validateStatus: (status) => status! < 500,
-  ));
+  @override
+  void initState() {
+    super.initState();
+    secureStorage = const FlutterSecureStorage();
+    dio = Dio(
+      BaseOptions(
+        baseUrl: 'http://192.168.110.159:5000/api',
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 30),
+        followRedirects: true,
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    )..interceptors.add(InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          // 从 FlutterSecureStorage 获取保存的令牌
+          String? token = await secureStorage.read(key: 'authToken');
+          try {
+            await secureStorage.write(key: 'authToken', value: token);
+            print('Token stored successfully.');
+          } catch (e) {
+            print('Failed to store token: $e');
+          }
+
+          // 如果令牌存在，将其添加到请求头中
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+
+          // 继续处理请求
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          // 在这里可以对响应数据进行处理
+          return handler.next(response);
+        },
+        onError: (DioError error, handler) {
+          // 在这里可以对错误进行处理
+          return handler.next(error);
+        },
+      ));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AuthService.checkToken(context); // 检查令牌并处理页面跳转
+    });
+  }
 
   void _login() async {
     String username = usernameController.text;
@@ -36,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
       errorMessage.value = "用户名或密码不能为空";
       return;
     }
-
+    if (isLoading) return;
     setState(() {
       isLoading = true;
     });
@@ -65,14 +108,18 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         isLoading = false;
       });
-
       if (response.statusCode == 200) {
         final responseData = response.data;
         if (responseData['success']) {
-          Navigator.push(
+          String token = responseData['token']; // 令牌
+          await secureStorage.write(key: 'authToken', value: token);
+          errorMessage.value = "登录成功！两秒后跳转……";
+          Future.delayed(const Duration(seconds: 2), () {
+            Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const QuizMenuPage()));
-          errorMessage.value = "登录成功！";
+              MaterialPageRoute(builder: (context) => const MyHomePage(title: '首页',)),
+            );
+          });
         } else {
           errorMessage.value = responseData['message'] ?? "用户名或密码错误";
         }
@@ -102,20 +149,22 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("")),
+      appBar: AppBar(title: const Text("")),
       body: Padding(
-        padding: EdgeInsets.all(0),
+        padding: const EdgeInsets.all(0),
         child: ListView(
           children: <Widget>[
             const SizedBox(height: 60),
             Container(
               alignment: Alignment.topLeft,
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Obx(
-                    () => Text(
+                () => Text(
                   "欢迎登录",
                   style: TextStyle(
-                    color: GlobalService.to.isDarkModel ? Colors.white : Color(0xFF2E7D32),
+                    color: GlobalService.to.isDarkModel
+                        ? Colors.white
+                        : const Color(0xFF2E7D32),
                     fontWeight: FontWeight.w500,
                     fontSize: 30,
                   ),
@@ -124,20 +173,23 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 40),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               alignment: Alignment.bottomRight,
               child: TextButton(
                 onPressed: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RegisterPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RegisterPage(),
+                    ),
+                  );
                 },
-                child: Text("没有账户？点击注册"),
+                child: const Text("没有账户？点击注册"),
               ),
             ),
             Container(
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25), // 设置圆角半径
               ),
@@ -145,7 +197,8 @@ class _LoginPageState extends State<LoginPage> {
                 controller: usernameController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25), // 与 Container 的圆角一致
+                    borderRadius:
+                        BorderRadius.circular(25), // 与 Container 的圆角一致
                   ),
                   labelText: '  用户名',
                 ),
@@ -154,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 20),
             Container(
               alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25), // 设置圆角半径
               ),
@@ -163,7 +216,8 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: true,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25), // 与 Container 的圆角一致
+                    borderRadius:
+                        BorderRadius.circular(25), // 与 Container 的圆角一致
                   ),
                   labelText: '  密码',
                 ),
@@ -171,42 +225,42 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 20),
             Obx(
-                  () => errorMessage.value.isNotEmpty
+              () => errorMessage.value.isNotEmpty
                   ? Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: 30),
-                child: Text(
-                  errorMessage.value,
-                  style: TextStyle(color: Colors.red),
-                ),
-              )
-                  : SizedBox.shrink(),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Text(
+                        errorMessage.value,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               alignment: Alignment.topLeft,
               child: TextButton(
                 onPressed: () {
                   // 忘记密码的逻辑
                 },
-                child: Text('忘记密码？'),
+                child: const Text('忘记密码？'),
               ),
             ),
             Container(
               alignment: Alignment.centerRight,
-              padding: EdgeInsets.symmetric(horizontal: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               child: ElevatedButton(
                 onPressed: isLoading ? null : _login,
                 child: isLoading
                     ? const SizedBox(
-                  width: 24, // 设置加载动画的宽度
-                  height: 24, // 设置加载动画的高度
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2.0, // 设置加载动画的线条宽度
-                  ),
-                )
-                    : Icon(Icons.arrow_forward_rounded),
+                        width: 24, // 设置加载动画的宽度
+                        height: 24, // 设置加载动画的高度
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.0, // 设置加载动画的线条宽度
+                        ),
+                      )
+                    : const Icon(Icons.arrow_forward_rounded),
               ),
             ),
           ],

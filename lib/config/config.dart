@@ -13,7 +13,7 @@ class ConstConfig {
   static const iosKey = '设置你的苹果key';
 
   /// web服务
-  static const webKey = '设置你的web服务key';
+  static const webKey = 'f4af285e3c44eff88ab71d535d8c863a';
 
   /// 构造AMapKeyConfig
   static const AMapApiKey amapApiKeys =
