@@ -109,7 +109,6 @@ class _QuizMenuPageState extends State<QuizMenuPage> {
         });
       }
     }
-
     // 提交答案后减少一次答题机会
     Future<void> _reduceChance() async {
       try {
@@ -136,63 +135,148 @@ class _QuizMenuPageState extends State<QuizMenuPage> {
       }
     }
 
-    // 提交答案并处理得分和机会
-    void _submitAnswers() {
-      // 检查是否有未选择的选项
-      bool hasUnansweredQuestions = questions.any((
-          question) => question['selectedOption'] == null);
-
-      if (hasUnansweredQuestions) {
-        // 如果有未回答的问题，弹出提示
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('提示'),
-              content: const Text('您还有未完成的题目，请选择答案。'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('确定'),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // 关闭提示框
-                  },
-                ),
-              ],
-            );
+  // 提交答案后增加积分
+  Future<void> _addPoint(int score) async {
+    try {
+      String? token = await secureStorage.read(key: 'authToken');
+      final response = await dio.post(
+        '/add_score',
+        data:{'score':score},
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token, // 添加 Token 到请求头
           },
-        );
-      } else {
-        // 如果所有问题都已回答，计算得分
-        int score = 0;
-        for (var question in questions) {
-          if (question['selectedOption'] == question['correct_option']) {
-            score++;
-          }
-        }
+        ),
+      );
 
-        // 显示得分弹窗并减少一次答题机会
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('答题结果'),
-              content: Text('您的得分是 $score/${questions.length}'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('确定 '),
-                  onPressed: () async {
-                    await _reduceChance(); // 减少一次答题机会
-                    Navigator.of(context).pop(); // 关闭弹窗
-                    Navigator.of(context).pop(); // 返回首页
-                  },
-                ),
-              ],
-            );
-          },
-        );
+      if (response.statusCode != 200) {
+        setState(() {
+          errorMessage = '无法增加分数，请稍后再试';
+        });
       }
+    } catch (e) {
+      setState(() {
+        errorMessage = '网络错误，请检查您的连接';
+      });
     }
+  }
+    // 提交答案并处理得分和机会
+  void _submitAnswers() {
+    // 检查是否有未选择的选项
+    bool hasUnansweredQuestions = questions.any(
+          (question) => question['selectedOption'] == null,
+    );
 
+    if (hasUnansweredQuestions) {
+      // 如果有未回答的问题，弹出提示
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('提示'),
+            content: const Text('您还有未完成的题目，请选择答案。'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('确定'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // 关闭提示框
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // 如果所有问题都已回答，计算得分
+      int score = 0;
+      List<Map<String, dynamic>> wrongAnswers = []; // 错题列表
+
+      for (var question in questions) {
+        if (question['selectedOption'] == question['correct_option']) {
+          score++;
+        } else {
+          wrongAnswers.add(question); // 记录答错的题目
+        }
+      }
+      _addPoint(score*2);
+      // 显示得分弹窗并减少一次答题机会
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('答题结果'),
+            content: Text('您的得分是 $score/${questions.length}\n恭喜您，本次获得${score*2}个积分！'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('查看错题'),
+                onPressed: () async{
+                  await _reduceChance(); // 减少一次答题机会
+                  Navigator.of(context).pop(); // 关闭弹窗
+                  _showWrongAnswers(wrongAnswers); // 显示错题详情
+                },
+              ),
+              TextButton(
+                child: const Text('确定 '),
+                onPressed: () async {
+                  await _reduceChance(); // 减少一次答题机会
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const QuizMenuPage(), // 重新加载当前页面
+                    ),
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+  //显示错误答案
+  void _showWrongAnswers(List<Map<String, dynamic>> wrongAnswers) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('错题详情'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: wrongAnswers.length,
+              itemBuilder: (context, index) {
+                final question = wrongAnswers[index];
+                return ListTile(
+                  title: Text('题目: ${question["description"]}'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('您的答案: ${question["options"][question["selectedOption"]! - 1]}'),
+                      Text('正确答案: ${question["options"][question["correct_option"] - 1]}'),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('确定'),
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                    builder: (context) => const QuizMenuPage())
+                );
+              }
+            )
+          ],
+        );
+      },
+    );
+  }
     @override
     Widget build(BuildContext context) {
       return Scaffold(

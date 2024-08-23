@@ -393,20 +393,22 @@ class _SortPageState extends State<SortPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
+                ElevatedButton.icon(
                   onPressed: () async {
                     _result = null;
                     await _getImageFromCamera();
                   },
-                  child: const Text('拍照识别'),
+                  label: const Text('拍照识别'),
+                  icon: const Icon(Icons.photo_camera),
                 ),
                 const SizedBox(width: 20),
-                ElevatedButton(
+                ElevatedButton.icon(
                   onPressed: () async {
                     _result = null;
                     await _getImageFromGallery();
                   },
-                  child: const Text('相册选择'),
+                  label: const Text('相册选择'),
+                  icon: const Icon(Icons.photo_album),
                 ),
               ],
             ),

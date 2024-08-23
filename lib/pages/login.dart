@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_app/main.dart';
-import 'package:local_app/pages/quiz/quiz_menu.dart';
 import 'package:local_app/pages/register.dart';
 import 'package:local_app/pages/auth_service.dart';
 import '../theme/global.dart';
@@ -124,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
           errorMessage.value = responseData['message'] ?? "用户名或密码错误";
         }
       } else {
-        errorMessage.value = "服务器错误，请稍后再试";
+        errorMessage.value = "服务器未查询到该用户，请检查用户名或密码";
       }
     } on DioException catch (e) {
       print('Dio Error: ${e.message}');
@@ -231,7 +230,8 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Text(
                         errorMessage.value,
-                        style: const TextStyle(color: Colors.red),
+                        style: errorMessage.value == '登录成功！两秒后跳转……' ? const TextStyle(color: Colors.green)
+                            : const TextStyle(color: Colors.red),
                       ),
                     )
                   : const SizedBox.shrink(),
