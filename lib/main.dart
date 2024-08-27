@@ -121,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Dio dio = Dio();
         dio.options.headers['Authorization'] = token; // 将token添加到请求头中
         final response =
-            await dio.get('http://192.168.110.159:5000/api/get_username');
+            await dio.get('http://112.124.62.169:5000/api/get_username');
         if (response.statusCode == 200 && response.data != null) {
           setState(() {
             _username = response.data['username']; // 保存用户名
@@ -134,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Dio dio = Dio();
         dio.options.headers['Authorization'] = token; // 将token添加到请求头中
         final response =
-            await dio.get('http://192.168.110.159:5000/api/get_score');
+            await dio.get('http://112.124.62.169:5000/api/get_score');
         if (response.statusCode == 200 && response.data != null) {
           setState(() {
             _userpoint = response.data['score']; // 保存积分
