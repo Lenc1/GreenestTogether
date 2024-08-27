@@ -36,7 +36,8 @@ class _MapPageState extends State<MapPage> {
   var markerLongitude;
   double? meLatitude;
   double? meLongitude;
-
+  //默认位置 北京天安门
+  final LatLng defaultLocation = LatLng(39.908823, 116.397470);
 
   @override
   void initState() { //初始化
@@ -46,7 +47,7 @@ class _MapPageState extends State<MapPage> {
     AMapFlutterLocation.setApiKey(ConstConfig.androidKey, ConstConfig.iosKey);
     AMapFlutterLocation.updatePrivacyAgree(true);
     AMapFlutterLocation.updatePrivacyShow(true, true);
-    _loadSavedLocations();
+    currentLocation = CameraPosition(target: defaultLocation, zoom: 15);
     requestPermission();
   }
   Future<void> _loadSavedLocations() async {
@@ -200,6 +201,7 @@ class _MapPageState extends State<MapPage> {
               target: LatLng(latitude, longitude),
               zoom: 30,
             );
+            _loadSavedLocations();
           });
         }
       })
@@ -384,7 +386,7 @@ class _MapPageState extends State<MapPage> {
             Navigator.pop(context); // 返回上一个页面
           },
         ),
-        title: const Text("绿色出行"),
+        title: const Text("碳索世界"),
         actions: <Widget>[
           Builder(
             builder: (context) => IconButton(
@@ -498,7 +500,13 @@ class _MapPageState extends State<MapPage> {
       ),
 
       body: currentLocation == null
-          ? Center(child: CircularProgressIndicator())
+          ? const Stack(
+          children: [
+            Center(
+              child: CircularProgressIndicator(),
+            ),
+          ]
+          )
           : Stack(
         children: [
           Column(

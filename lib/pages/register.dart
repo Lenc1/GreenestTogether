@@ -17,7 +17,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final RxString errorMessage = ''.obs; // 用于显示错误信息
   bool isLoading = false; // 用于加载指示器
   final Dio dio = Dio(BaseOptions(
-    baseUrl: 'http://192.168.110.159:5000/api',
+    baseUrl: 'http://112.124.62.169:5000/api',
     connectTimeout: Duration(seconds: 20),
     receiveTimeout: Duration(seconds: 20),
   ));

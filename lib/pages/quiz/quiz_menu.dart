@@ -18,7 +18,7 @@ class _QuizMenuPageState extends State<QuizMenuPage> {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   final Dio dio = Dio(
     BaseOptions(
-      baseUrl: 'http://192.168.110.159:5000/api',
+      baseUrl: 'http://112.124.62.169:5000/api', //阿里云地址
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
       sendTimeout: const Duration(seconds: 30),

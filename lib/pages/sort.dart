@@ -160,7 +160,6 @@ class _SortPageState extends State<SortPage> {
       'file':
           await MultipartFile.fromFile(_imageup!.path, filename: 'upload.jpg'),
     });
-
     String url = 'http://lss.howiehz.top:41001/'; // 服务器地址和端点,更换服务器时修改
     try {
       print("发送 POST 请求到: $url");
@@ -175,7 +174,6 @@ class _SortPageState extends State<SortPage> {
         setState(() {
           _result = data['answer']; // 显示服务器返回的分类结果
         });
-
         // 保存图片路径和识别结果到 Hive
         var box = Hive.box('recognition_history');
         box.add({
@@ -220,12 +218,11 @@ class _SortPageState extends State<SortPage> {
         child: Obx(
           () => Container(
             color: GlobalService.to.isDarkModel
-                ? const Color(0xFF2F2E33) // Dark mode background color
-                : Colors.white, // Light mode background color
+                ? const Color(0xFF2F2E33)
+                : Colors.white,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                // Top close button section
                 Container(
                   padding: const EdgeInsets.fromLTRB(5, 30, 20, 0),
                   alignment: Alignment.topLeft,
@@ -289,9 +286,7 @@ class _SortPageState extends State<SortPage> {
                             color:  Colors.deepOrange,
                           ),
                           ),
-                          // Display recognition results
                           onTap: () {
-                            // Handle image display or other actions
                           },
                         ),
                       );
@@ -354,7 +349,7 @@ class _SortPageState extends State<SortPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center, // 水平方向居中
               children: [
-                if (_result != null)
+                if (_result != null && _result != '识别中...')
                   const Text(
                     '识别结果：',
                     style: TextStyle(
@@ -362,6 +357,13 @@ class _SortPageState extends State<SortPage> {
                         fontSize: 20,
                         color: Colors.black87),
                   ),
+                if (_result == '识别中...')
+                  Text('$_result',
+    style: const TextStyle(
+    fontWeight: FontWeight.w600,
+    fontSize: 20,
+    color: Colors.grey),
+    ),
                 if (_result == '可回收垃圾'||_result=='Recycle')
                   Text(
                     '$_result',
@@ -384,7 +386,7 @@ class _SortPageState extends State<SortPage> {
             if (_image != null && _result == null)
               ElevatedButton(
                 onPressed: () async {
-                  _result = null;
+                  _result = '识别中...';
                   await _sendImageToServer(); // 发送图片到服务器
                 },
                 child: const Text('上传图片'),

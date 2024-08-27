@@ -58,7 +58,6 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-
   // 检查是否存在Token
   static Future<bool> _hasToken() async {
     String? token = await secureStorage.read(key: 'authToken');
@@ -286,7 +285,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   Icon(Icons.settings),
                                   SizedBox(width: 10),
                                   Text(
-                                    "设置",
+                                    "设置 ",
                                     style: TextStyle(fontSize: 15),
                                   ),
                                 ],
@@ -361,7 +360,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  ElevatedButton.icon(
+                  OutlinedButton.icon(
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -378,30 +377,28 @@ class _MyHomePageState extends State<MyHomePage> {
                           fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                     icon: const Icon(Icons.map_outlined),
-                    label: const Text("绿色出行"),
+                    label: const Text("碳索世界"),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SortPage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      textStyle: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600),
-                    ),
+                  OutlinedButton.icon(onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SortPage()),
+                    );
+                  },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        textStyle: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),),
                     icon: const Icon(Icons.sort),
                     label: const Text("智能分类"),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton.icon(
+                  OutlinedButton.icon(
                     onPressed: () async {
                       String? token =
                           await secureStorage.read(key: 'authToken');
