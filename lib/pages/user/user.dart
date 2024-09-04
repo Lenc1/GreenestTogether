@@ -50,16 +50,15 @@ class _UserPageState extends State<UserPage> {
     try {
       String? token = await secureStorage.read(key: 'authToken');
       if (token != null) {
-        final response = await _dio.post(
-          '${API.reqUrl}/api/nickname', // 使用全局 API.reqUrl
-          data: {'nickname': _newUsername, 'action': 'update'},
+        final response = await _dio.put(
+          '${API.reqUrl}/update_nickname', // 使用全局 API.reqUrl
+          data: {'nickname': _newUsername},
           options: Options(
             headers: {
-              'Authorization': 'Bearer $token',
+              'Authorization': token,
             },
           ),
         );
-
         if (response.data['success']) {
           setState(() {
             _username = _newUsername;
