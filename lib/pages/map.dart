@@ -461,13 +461,13 @@ class _MapPageState extends State<MapPage> {
         ),
         title: TextField(
           decoration: InputDecoration(
-            hintText: "搜索地点",
-            suffixIcon: IconButton(
-              icon: Icon(Icons.search_outlined),
-              onPressed: () {
-                _searchPlace('天安门');
-              },
-            )
+              hintText: "搜索地点",
+              suffixIcon: IconButton(
+                icon: Icon(Icons.search_outlined),
+                onPressed: () {
+                  _searchPlace('天安门');
+                },
+              )
           ),
           onSubmitted: (value) {
             _searchPlace(value);
@@ -512,53 +512,53 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ),
                 Expanded(
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _savedLocations.length,
-                        itemBuilder: (context, index) {
-                          final location = _savedLocations[index];
-                          final note = _locationNotes[index]; // 获取备注
-                          return Slidable(
-                            key: Key(location.toString()),
-                            direction: Axis.horizontal,
-                            endActionPane: ActionPane(
-                              motion: const BehindMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (context) => _deleteLocation(index),
-                                  foregroundColor: GlobalService.to.isDarkModel
-                                      ? Colors.black45
-                                      : Colors.white,
-                                  backgroundColor: GlobalService.to.isDarkModel
-                                      ? Colors.white
-                                      : Colors.black45,
-                                  icon: Icons.delete,
-                                  label: '删除',
-                                ),
-                              ],
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _savedLocations.length,
+                    itemBuilder: (context, index) {
+                      final location = _savedLocations[index];
+                      final note = _locationNotes[index]; // 获取备注
+                      return Slidable(
+                        key: Key(location.toString()),
+                        direction: Axis.horizontal,
+                        endActionPane: ActionPane(
+                          motion: const BehindMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (context) => _deleteLocation(index),
+                              foregroundColor: GlobalService.to.isDarkModel
+                                  ? Colors.black45
+                                  : Colors.white,
+                              backgroundColor: GlobalService.to.isDarkModel
+                                  ? Colors.white
+                                  : Colors.black45,
+                              icon: Icons.delete,
+                              label: '删除',
                             ),
-                            child: ListTile(
-                              title: Text(note.isEmpty ? '暂无备注' : note),
-                              subtitle: Text('◎${index + 1}(${location.latitude.toStringAsFixed(6)} , ${location.longitude.toStringAsFixed(6)})'), // 显示备注
-                              onTap: () {
-                                _removeAll();
-                                _addMarker(location);
-                                markerLongitude = location.longitude.toString();
-                                markerLatitude = location.latitude.toString();
-                                Navigator.of(context).pop(); // 关闭Drawer
-                                _changeCameraPosition(location); // 移动到选中的位置
-                              },
-                              trailing: IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () {
-                                  _editLocationNoteDialog(index);
-                                },
-                              ),
-                            ),
-                          );
-                        },
+                          ],
+                        ),
+                        child: ListTile(
+                          title: Text(note.isEmpty ? '暂无备注' : note),
+                          subtitle: Text('◎${index + 1}(${location.latitude.toStringAsFixed(6)} , ${location.longitude.toStringAsFixed(6)})'), // 显示备注
+                          onTap: () {
+                            _removeAll();
+                            _addMarker(location);
+                            markerLongitude = location.longitude.toString();
+                            markerLatitude = location.latitude.toString();
+                            Navigator.of(context).pop(); // 关闭Drawer
+                            _changeCameraPosition(location); // 移动到选中的位置
+                          },
+                          trailing: IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              _editLocationNoteDialog(index);
+                            },
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 ListTile(
@@ -592,7 +592,7 @@ class _MapPageState extends State<MapPage> {
               child: CircularProgressIndicator(),
             ),
           ]
-          )
+      )
           : Stack(
         children: [
           Column(
@@ -619,16 +619,16 @@ class _MapPageState extends State<MapPage> {
             ],
           ),
           Positioned(
-            top: 16,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: (){
-                _changeCameraPosition(LatLng(meLatitude!, meLongitude!));
-              },
-              child: const Icon(
-                Icons.gps_fixed
-              ),
-            )
+              top: 16,
+              right: 16,
+              child: FloatingActionButton(
+                onPressed: (){
+                  _changeCameraPosition(LatLng(meLatitude!, meLongitude!));
+                },
+                child: const Icon(
+                    Icons.gps_fixed
+                ),
+              )
           ),
           Positioned(
             top: 156,

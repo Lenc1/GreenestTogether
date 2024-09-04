@@ -122,6 +122,10 @@ class _MyHomePageState extends State<MyHomePage> {
         dio.options.headers['Authorization'] = token; // 将token添加到请求头中
         final response =
             await dio.get('/get_nickname');
+        if (response.statusCode == 401){
+          await secureStorage.delete(
+              key: 'authToken');
+        }
         if (response.statusCode == 200 && response.data != null) {
           setState(() {
             _username = response.data['nickname']; // 保存用户名

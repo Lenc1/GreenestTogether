@@ -25,6 +25,7 @@ class _SortPageState extends State<SortPage> {
   File? _image; // 保存用户选择的当前图片
   File? _imageup;
   String? _result; // 保存分类结果
+  String? _probability;
   bool _isLoading = false; // 控制加载动画的显示
   List<File> _imageHistory = []; // 保存图片历史记录
   List<String> _imageResults = []; // 保存识别结果
@@ -175,6 +176,7 @@ class _SortPageState extends State<SortPage> {
         var data = response.data;
         setState(() {
           _result = data['answer']; // 显示服务器返回的分类结果
+          _probability = data['probability'];
         });
         // 保存图片路径和识别结果到 Hive
         var box = Hive.box('recognition_history');
@@ -317,82 +319,84 @@ class _SortPageState extends State<SortPage> {
           ),
         ),
       ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (_result == null) const SizedBox(height: 18), // 间距
-              if (_image != null)
-                Stack(
-                  children: [
-                    // 图片容器
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: DecorationImage(
-                          image: FileImage(_image!),
-                          fit: BoxFit.cover,
-                          colorFilter: _isLoading
-                              ? ColorFilter.mode(
-                              Colors.white.withOpacity(0.5), BlendMode.dstATop)
-                              : null, // 设置图片的半透明效果
-                        ),
-                      ),
-                      height: 250,
-                      width: 250,
-                    ),
-                    if (_isLoading)
-                      const Positioned.fill(
-                        child: Center(
-                          child: CircularProgressIndicator(), // 显示加载动画
-                        ),
-                      ),
-                  ],
-                ),
-              if (_image == null)
-                const Icon(Icons.photo_size_select_actual_outlined, size: 80),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center, // 水平方向居中
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_result == null) const SizedBox(height: 18), // 间距
+            if (_image != null)
+              Stack(
                 children: [
-                  if (_result != null && _result != '识别中...')
-                    const Text(
-                      '识别结果：',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 20,
-                        color: Colors.black87,
+                  // 图片容器
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      image: DecorationImage(
+                        image: FileImage(_image!),
+                        fit: BoxFit.cover,
+                        colorFilter: _isLoading
+                            ? ColorFilter.mode(Colors.white.withOpacity(0.5),
+                                BlendMode.dstATop)
+                            : null, // 设置图片的半透明效果
                       ),
                     ),
-                  if (_result == '识别中...')
-                    Text(
-                      '$_result',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  if (_result == '可回收垃圾' || _result == 'Recycle')
-                    Text(
-                      '$_result',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                        color: Colors.green,
-                      ),
-                    ),
-                  if (_result == '不可回收垃圾' || _result == 'Organic')
-                    Text(
-                      '$_result',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                        color: Colors.deepOrange,
+                    height: 250,
+                    width: 250,
+                  ),
+                  if (_isLoading)
+                    const Positioned.fill(
+                      child: Center(
+                        child: CircularProgressIndicator(), // 显示加载动画
                       ),
                     ),
                 ],
               ),
+            if (_image == null)
+              const Icon(Icons.photo_size_select_actual_outlined, size: 80),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center, // 水平方向居中
+              children: [
+                if (_result != null && _result != '识别中...')
+                  const Text(
+                    '识别结果：',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 20,
+                      color: Colors.black87,
+                    ),
+                  ),
+                if (_result == '识别中...')
+                  Text(
+                    '$_result',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      color: Colors.grey,
+                    ),
+                  ),
+                if (_result == '可回收垃圾' || _result == 'Recycle')
+                  Text(
+                    '$_result',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      color: Colors.green,
+                    ),
+                  ),
+                if (_result == '不可回收垃圾' || _result == 'Organic')
+                  Text(
+                    '$_result',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      color: Colors.deepOrange,
+                    ),
+                  ),
+              ],
+            ),
             const SizedBox(height: 20),
+            if(_result != null && _result != '识别中...')
+              Text('精准度： ${(double.parse(_probability!) * 100).toStringAsFixed(2)}%'),
             if (_image != null && _result == null)
               ElevatedButton(
                 onPressed: () async {

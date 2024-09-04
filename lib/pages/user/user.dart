@@ -51,7 +51,7 @@ class _UserPageState extends State<UserPage> {
       String? token = await secureStorage.read(key: 'authToken');
       if (token != null) {
         final response = await _dio.put(
-          '${API.reqUrl}/update_nickname', // 使用全局 API.reqUrl
+          '${API.reqUrl}/update_nickname',
           data: {'nickname': _newUsername},
           options: Options(
             headers: {
