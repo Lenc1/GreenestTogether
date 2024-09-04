@@ -15,7 +15,9 @@ import 'package:local_app/theme/global.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // 新增
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../config/global_preference.dart'; // 新增
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -47,7 +49,7 @@ class _MapPageState extends State<MapPage> {
     AMapFlutterLocation.setApiKey(ConstConfig.androidKey, ConstConfig.iosKey);
     AMapFlutterLocation.updatePrivacyAgree(true);
     AMapFlutterLocation.updatePrivacyShow(true, true);
-    currentLocation = CameraPosition(target: defaultLocation, zoom: 15);
+    currentLocation = CameraPosition(target: defaultLocation, zoom: API.zoom);
     requestPermission();
   }
   Future<void> _loadSavedLocations() async {
@@ -225,9 +227,6 @@ class _MapPageState extends State<MapPage> {
 
     // 移动相机到点击位置
     _changeCameraPosition(latLng);
-
-    // 获取周边兴趣点数据
-    _getPoisData();
   }
 
   final Map<String, Marker> _markers = <String, Marker>{};
@@ -258,7 +257,7 @@ class _MapPageState extends State<MapPage> {
       CameraUpdate.newCameraPosition(
         CameraPosition(
           target: markPostion,
-          zoom: zoom,
+          zoom: API.seZoom,
           tilt: 30,
           bearing: 0,
         ),
@@ -334,7 +333,7 @@ class _MapPageState extends State<MapPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('距离计算结果'),
+          title: const Text('碳足迹'),
           content: Text('当前距离: ${distance.toStringAsFixed(2)} 公里\n选择绿色出行，将减少${(7.5 * 0.01 * distance).toStringAsFixed(2)}kg碳排放'),
           actions: <Widget>[
             TextButton(
@@ -348,8 +347,77 @@ class _MapPageState extends State<MapPage> {
       },
     );
   }
+  Future<void> _searchPlace(String keyword) async {
+    final Dio dio = Dio();
+    const String url = "https://restapi.amap.com/v3/place/text";
 
+    // 确保 API Key 的正确性
+    final Map<String, String> queryParameters = {
+      'key': ConstConfig.androidKey, // 使用你配置的 key
+      'keywords': keyword,
+      'city': "北京", // 设置默认城市为北京
+      'children': "1",
+      'offset': "20",
+      'page': "1",
+      'extensions': "all",
+    };
 
+    try {
+      // 发送请求
+      final response = await dio.get(url, queryParameters: queryParameters);
+
+      // 检查响应数据
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        // 检查 'pois' 字段是否存在且不为空
+        if (responseData['pois'] != null && responseData['pois'].isNotEmpty) {
+          // 如果有结果，则显示搜索结果
+          _showSearchResults(responseData['pois']);
+        } else {
+          // 如果没有找到结果，显示无结果对话框
+          _showNoResultsDialog();
+        }
+      } else {
+        // 如果响应状态码不是 200，处理异常
+        print("错误：请求失败，状态码：${response.statusCode}");
+        //_showErrorDialog("请求失败，状态码：${response.statusCode}");
+      }
+    } catch (e) {
+      // 捕获请求中的任何错误
+      print("错误：$e");
+      //_showErrorDialog(e.toString());
+    }
+  }
+
+  void _showSearchResults(List pois) {
+    _removeAll();
+    setState(() {
+      for (var poi in pois) {
+        LatLng location = LatLng(double.parse(poi['location'].split(",")[1]), double.parse(poi['location'].split(",")[0]));
+        _addMarker(location);
+      }
+    });
+  }
+
+  void _showNoResultsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('没有结果'),
+          content: const Text('未找到符合条件的地点，请尝试其他关键字。'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 关闭弹窗
+              },
+              child: const Text('确定'),
+            ),
+          ],
+        );
+      },
+    );
+  }
   void _showSuccessDialog() {
     showDialog(
       context: context,
@@ -376,6 +444,11 @@ class _MapPageState extends State<MapPage> {
       _saveLocations();
     });
   }
+  void _clearMarkers() {
+    setState(() {
+      _markers.clear();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -386,7 +459,20 @@ class _MapPageState extends State<MapPage> {
             Navigator.pop(context); // 返回上一个页面
           },
         ),
-        title: const Text("碳索世界"),
+        title: TextField(
+          decoration: InputDecoration(
+            hintText: "搜索地点",
+            suffixIcon: IconButton(
+              icon: Icon(Icons.search_outlined),
+              onPressed: () {
+                _searchPlace('天安门');
+              },
+            )
+          ),
+          onSubmitted: (value) {
+            _searchPlace(value);
+          },
+        ),
         actions: <Widget>[
           Builder(
             builder: (context) => IconButton(
@@ -455,7 +541,7 @@ class _MapPageState extends State<MapPage> {
                             ),
                             child: ListTile(
                               title: Text(note.isEmpty ? '暂无备注' : note),
-                              subtitle: Text('#${index + 1}'), // 显示备注
+                              subtitle: Text('◎${index + 1}(${location.latitude.toStringAsFixed(6)} , ${location.longitude.toStringAsFixed(6)})'), // 显示备注
                               onTap: () {
                                 _removeAll();
                                 _addMarker(location);
@@ -637,37 +723,5 @@ class _MapPageState extends State<MapPage> {
         ],
       ),
     );
-  }
-
-  Future<void> _getPoisData() async {
-    print('获取数据');
-    print(markerLatitude);
-    print(markerLongitude);
-
-    final Dio dio = Dio();
-    const String url =
-        "https://restapi.amap.com/v3/place/around?key=${ConstConfig.androidKey}";
-    final Map<String, String> queryParameters = {
-      'location': "$markerLatitude,$markerLongitude",
-      'keywords': "",
-      'types': "风景名胜",
-      'radius': "1000",
-      'offset': "20",
-      'page': "1",
-      'extensions': "all",
-    };
-    try {
-      final response = await dio.get(url, queryParameters: queryParameters);
-      final responseData = response.data;
-      print(responseData);
-      setState(() {
-        poisData = responseData['pois'];
-      });
-    } catch (e) {
-      print('Failed to fetch POIs: $e');
-      setState(() {
-        poisData = [];
-      });
-    }
   }
 }

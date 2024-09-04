@@ -121,10 +121,10 @@ class _MyHomePageState extends State<MyHomePage> {
       try {
         dio.options.headers['Authorization'] = token; // 将token添加到请求头中
         final response =
-            await dio.get('/get_username');
+            await dio.get('/get_nickname');
         if (response.statusCode == 200 && response.data != null) {
           setState(() {
-            _username = response.data['username']; // 保存用户名
+            _username = response.data['nickname']; // 保存用户名
           });
         }
       } catch (e) {
@@ -225,14 +225,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               : Colors.white,
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
-                            // 设置卡片内部的填充
                             child: Row(
                               children: [
                                 ClipOval(
                                   child: Image(
                                     image: GlobalService.to.isDarkModel
                                         ? const AssetImage(
-                                            'assets/images/darkcat.png')
+                                            'assets/images/logo.png')
                                         : const AssetImage(
                                             'assets/images/logo.png'),
                                     width: 60,
@@ -278,10 +277,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               : Colors.white,
                           child: const Padding(
                               padding: EdgeInsets.all(20.0),
-                              // 设置卡片内部的填充
                               child: Row(
                                 children: [
-                                  Icon(Icons.settings),
+                                  Icon(Icons.settings_outlined),
                                   SizedBox(width: 10),
                                   Text(
                                     "设置 ",
@@ -353,8 +351,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Obx(
                       () => Image(
                         image: GlobalService.to.isDarkModel
-                            ? const AssetImage('assets/images/darkcat.png')
-                            : const AssetImage('assets/images/bg.png'),
+                            ? const AssetImage('assets/images/Light.png')
+                            : const AssetImage('assets/images/Light.png'),
                       ),
                     ),
                   ),

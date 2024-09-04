@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -273,22 +274,20 @@ class _SortPageState extends State<SortPage> {
                                 width: 50, height: 50, fit: BoxFit.cover),
                           ),
                           title: Text(
-                            _imageResults[index] == '可回收垃圾'?
-                              '可回收':'不可回收',style: _imageResults[index] == '可回收垃圾'?
-                          const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color:  Colors.green,
-                          )
-                              :
-                          const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color:  Colors.deepOrange,
+                            _imageResults[index] == '可回收垃圾' ? '可回收' : '不可回收',
+                            style: _imageResults[index] == '可回收垃圾'
+                                ? const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    color: Colors.green,
+                                  )
+                                : const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    color: Colors.deepOrange,
+                                  ),
                           ),
-                          ),
-                          onTap: () {
-                          },
+                          onTap: () {},
                         ),
                       );
                     },
@@ -318,71 +317,81 @@ class _SortPageState extends State<SortPage> {
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_result == null) const SizedBox(height: 18), // 间距
-            if (_image != null)
-              Stack(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (_result == null) const SizedBox(height: 18), // 间距
+              if (_image != null)
+                Stack(
+                  children: [
+                    // 图片容器
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        image: DecorationImage(
+                          image: FileImage(_image!),
+                          fit: BoxFit.cover,
+                          colorFilter: _isLoading
+                              ? ColorFilter.mode(
+                              Colors.white.withOpacity(0.5), BlendMode.dstATop)
+                              : null, // 设置图片的半透明效果
+                        ),
+                      ),
+                      height: 250,
+                      width: 250,
+                    ),
+                    if (_isLoading)
+                      const Positioned.fill(
+                        child: Center(
+                          child: CircularProgressIndicator(), // 显示加载动画
+                        ),
+                      ),
+                  ],
+                ),
+              if (_image == null)
+                const Icon(Icons.photo_size_select_actual_outlined, size: 80),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center, // 水平方向居中
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      image: DecorationImage(
-                        image: FileImage(_image!),
-                        fit: BoxFit.cover,
+                  if (_result != null && _result != '识别中...')
+                    const Text(
+                      '识别结果：',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 20,
+                        color: Colors.black87,
                       ),
                     ),
-                    height: 250,
-                    width: 250,
-                  ),
-                  if (_isLoading)
-                    const Positioned.fill(
-                      child: Center(
-                        child: CircularProgressIndicator(), // 显示加载动画
+                  if (_result == '识别中...')
+                    Text(
+                      '$_result',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  if (_result == '可回收垃圾' || _result == 'Recycle')
+                    Text(
+                      '$_result',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        color: Colors.green,
+                      ),
+                    ),
+                  if (_result == '不可回收垃圾' || _result == 'Organic')
+                    Text(
+                      '$_result',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        color: Colors.deepOrange,
                       ),
                     ),
                 ],
               ),
-            if (_image == null)
-              const Icon(Icons.photo_size_select_actual_outlined, size: 80),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center, // 水平方向居中
-              children: [
-                if (_result != null && _result != '识别中...')
-                  const Text(
-                    '识别结果：',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 20,
-                        color: Colors.black87),
-                  ),
-                if (_result == '识别中...')
-                  Text('$_result',
-    style: const TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 20,
-    color: Colors.grey),
-    ),
-                if (_result == '可回收垃圾'||_result=='Recycle')
-                  Text(
-                    '$_result',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                        color: Colors.green),
-                  ),
-                if (_result == '不可回收垃圾'|| _result =='Organic')
-                  Text(
-                    '$_result',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                        color: Colors.deepOrange),
-                  ),
-              ],
-            ),
             const SizedBox(height: 20),
             if (_image != null && _result == null)
               ElevatedButton(
