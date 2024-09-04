@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_app/main.dart';
 import 'package:local_app/pages/register.dart';
 import 'package:local_app/pages/auth_service.dart';
+import '../config/global_preference.dart';
 import '../theme/global.dart';
 import 'dart:convert';
 
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     secureStorage = const FlutterSecureStorage();
     dio = Dio(
       BaseOptions(
-        baseUrl: 'http://112.124.62.169:5000/api',
+        baseUrl: API.reqUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),

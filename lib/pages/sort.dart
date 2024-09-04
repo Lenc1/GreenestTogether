@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../config/global_preference.dart';
 import '../theme/global.dart'; // 获取临时目录
 
 class SortPage extends StatefulWidget {
@@ -160,7 +161,7 @@ class _SortPageState extends State<SortPage> {
       'file':
           await MultipartFile.fromFile(_imageup!.path, filename: 'upload.jpg'),
     });
-    String url = 'http://lss.howiehz.top:41001/'; // 服务器地址和端点,更换服务器时修改
+    String url = API.sortUrl; // 服务器地址和端点,更换服务器时修改
     try {
       print("发送 POST 请求到: $url");
       var response = await dio.post(

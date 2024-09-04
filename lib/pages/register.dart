@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
+import 'package:local_app/config/global_preference.dart';
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -17,7 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final RxString errorMessage = ''.obs; // 用于显示错误信息
   bool isLoading = false; // 用于加载指示器
   final Dio dio = Dio(BaseOptions(
-    baseUrl: 'http://112.124.62.169:5000/api',
+    baseUrl: API.reqUrl,
     connectTimeout: Duration(seconds: 20),
     receiveTimeout: Duration(seconds: 20),
   ));

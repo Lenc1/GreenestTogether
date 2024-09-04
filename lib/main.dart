@@ -13,6 +13,8 @@ import 'package:local_app/theme/theme.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'config/global_preference.dart';
+
 void main() {
   appInit();
 }
@@ -30,8 +32,7 @@ appInit() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  static final FlutterSecureStorage secureStorage =
-      const FlutterSecureStorage();
+  static FlutterSecureStorage get secureStorage => const FlutterSecureStorage();
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +59,6 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-  // 检查是否存在Token
   static Future<bool> _hasToken() async {
     String? token = await secureStorage.read(key: 'authToken');
     return token != null && token.isNotEmpty;
@@ -116,12 +116,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     String? token = await secureStorage.read(key: 'authToken');
+    Dio dio = Dio(BaseOptions(baseUrl: API.reqUrl));
     if (token != null && token.isNotEmpty) {
       try {
-        Dio dio = Dio();
         dio.options.headers['Authorization'] = token; // 将token添加到请求头中
         final response =
-            await dio.get('http://112.124.62.169:5000/api/get_username');
+            await dio.get('/get_username');
         if (response.statusCode == 200 && response.data != null) {
           setState(() {
             _username = response.data['username']; // 保存用户名
@@ -131,10 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
         print('Failed to fetch username: $e');
       }
       try {
-        Dio dio = Dio();
         dio.options.headers['Authorization'] = token; // 将token添加到请求头中
         final response =
-            await dio.get('http://112.124.62.169:5000/api/get_score');
+            await dio.get('/get_score');
         if (response.statusCode == 200 && response.data != null) {
           setState(() {
             _userpoint = response.data['score']; // 保存积分
@@ -330,7 +329,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         },
                       );
                     } else {
-                      return const SizedBox.shrink(); // 如果没有 token，则不显示登出按钮
+                      return const SizedBox.shrink();
                     }
                   },
                 ),
@@ -394,7 +393,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         textStyle: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),),
-                    icon: const Icon(Icons.sort),
+                    icon: const Icon(Icons.camera_alt_outlined),
                     label: const Text("智能分类"),
                   ),
                   const SizedBox(height: 20),

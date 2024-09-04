@@ -166,12 +166,12 @@ class _LocationPageState extends State<LocationPage> {
             Text('详细地址：$address'),
             const SizedBox(height: 20),
             ElevatedButton(
-              child: const Text('开始定位'),
               onPressed: _startLocation,
+              child: const Text('开始定位'),
             ),
             ElevatedButton(
-              child: const Text('停止定位'),
               onPressed: _stopLocation,
+              child: const Text('停止定位'),
             ),
           ],
         ),

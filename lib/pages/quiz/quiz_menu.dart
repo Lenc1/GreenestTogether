@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_app/config/global_preference.dart';
 
 class QuizMenuPage extends StatefulWidget {
   const QuizMenuPage({super.key});
@@ -18,7 +19,7 @@ class _QuizMenuPageState extends State<QuizMenuPage> {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   final Dio dio = Dio(
     BaseOptions(
-      baseUrl: 'http://112.124.62.169:5000/api', //阿里云地址
+      baseUrl: API.reqUrl,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
       sendTimeout: const Duration(seconds: 30),
@@ -286,7 +287,7 @@ class _QuizMenuPageState extends State<QuizMenuPage> {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               if (remainingChances > 0)
