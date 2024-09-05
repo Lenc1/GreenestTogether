@@ -2,11 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:local_app/pages/about.dart';
+import 'package:local_app/pages/compass.dart';
 import 'package:local_app/pages/login.dart';
 import 'package:local_app/pages/map.dart';
 import 'package:local_app/pages/quiz/quiz_menu.dart';
 import 'package:local_app/pages/settings.dart';
 import 'package:local_app/pages/sort.dart';
+import 'package:local_app/pages/suggestion.dart';
 import 'package:local_app/pages/user/user.dart';
 import 'package:local_app/theme/global.dart';
 import 'package:local_app/theme/theme.dart';
@@ -269,12 +272,99 @@ class _MyHomePageState extends State<MyHomePage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const SettingsPage()));
+                                  builder: (context) => const CompassPage()));
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(15.0), // 设置卡片的圆角效果
+                          ),
+                          color: GlobalService.to.isDarkModel
+                              ? Colors.white10
+                              : Colors.white,
+                          child: const Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.class_outlined),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "分类投放指南",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                ],
+                              )),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AboutUsPage()));
+                        },
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(15.0), // 设置卡片的圆角效果
+                          ),
+                          color: GlobalService.to.isDarkModel
+                              ? Colors.white10
+                              : Colors.white,
+                          child: const Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.people_alt_outlined),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "关于我们",
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                ],
+                              )),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SuggestionPage()));
+                        },
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(15.0), // 设置卡片的圆角效果
+                          ),
+                          color: GlobalService.to.isDarkModel
+                              ? Colors.white10
+                              : Colors.white,
+                          child: const Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.email_outlined),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "意见建议",
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                ],
+                              )),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SettingsPage()));
+                        },
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(15.0), // 设置卡片的圆角效果
                           ),
                           color: GlobalService.to.isDarkModel
                               ? Colors.white10

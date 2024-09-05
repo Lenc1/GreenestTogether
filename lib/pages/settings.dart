@@ -2,6 +2,8 @@ import '../config/global_preference.dart'; // Ensure this imports the correct AP
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../theme/global.dart';
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -13,6 +15,14 @@ class _SettingsPageState extends State<SettingsPage> {
   // This variable will be used to display the current zoom level on the Slider
   double _currentZoom = API.zoom;
   double _seZoom = API.seZoom;
+
+  void showWindow(){
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('已清除缓存'),
+          duration: Duration(milliseconds: 200),
+        ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +83,33 @@ class _SettingsPageState extends State<SettingsPage> {
             Text(
               '当前缩放等级: ${_seZoom.toStringAsFixed(1)}',
               style: const TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () {
+                showWindow();
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                  BorderRadius.circular(15.0), // 设置卡片的圆角效果
+                ),
+                color: GlobalService.to.isDarkModel
+                    ? Colors.white10
+                    : Colors.white,
+                child: const Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.cleaning_services_outlined),
+                        SizedBox(width: 10),
+                        Text(
+                          "清除缓存",
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    )),
+              ),
             ),
           ],
         ),

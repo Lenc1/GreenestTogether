@@ -163,7 +163,7 @@ class _SortPageState extends State<SortPage> {
       'file':
           await MultipartFile.fromFile(_imageup!.path, filename: 'upload.jpg'),
     });
-    String url = API.sortUrl; // 服务器地址和端点,更换服务器时修改
+    String url = API.sortUrl;
     try {
       print("发送 POST 请求到: $url");
       var response = await dio.post(
