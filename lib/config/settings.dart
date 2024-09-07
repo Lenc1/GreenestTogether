@@ -1,4 +1,4 @@
-import '../config/global_preference.dart'; // Ensure this imports the correct API class
+import 'global_preference.dart'; // Ensure this imports the correct API class
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

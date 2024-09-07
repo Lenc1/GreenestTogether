@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
@@ -16,8 +17,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final RxString errorMessage = ''.obs; // 用于显示错误信息
-  bool isLoading = false; // 用于加载指示器
+  final RxString errorMessage = ''.obs;
+  bool isLoading = false;
+  static FlutterSecureStorage get secureStorage => const FlutterSecureStorage();
   final Dio dio = Dio(BaseOptions(
     baseUrl: API.reqUrl,
     connectTimeout: Duration(seconds: 20),
@@ -62,6 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (response.statusCode == 201) {
         final responseData = response.data;
         if (responseData['success']) {
+          await secureStorage.write(key: 'avatarPath', value: '');
           errorMessage.value = "注册成功！请登录。";
           Navigator.pop(context);  // 注册成功后返回登录页面
         } else {

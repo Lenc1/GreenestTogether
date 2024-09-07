@@ -38,7 +38,7 @@ class _MapPageState extends State<MapPage> {
   var markerLongitude;
   double? meLatitude;
   double? meLongitude;
-  //默认位置 北京天安门
+  bool _firstTimeIn = true;
   final LatLng defaultLocation = LatLng(39.908823, 116.397470);
 
   @override
@@ -140,10 +140,10 @@ class _MapPageState extends State<MapPage> {
             TextButton(
               onPressed: () {
                 setState(() {
-                  _locationNotes.add('无备注'); // 不添加备注时，直接保存“无备注”
-                  _saveLocations(); // 保存位置和备注
-                  Navigator.of(context).pop(); // 关闭对话框
-                  _showSuccessDialog(); // 显示保存成功提示
+                  _locationNotes.add('无备注');
+                  _saveLocations();
+                  Navigator.of(context).pop();
+                  _showSuccessDialog();
                 });
               },
               child: const Text('不添加备注'),
@@ -152,13 +152,13 @@ class _MapPageState extends State<MapPage> {
               onPressed: () {
                 setState(() {
                   if (remark.isEmpty) {
-                    _locationNotes.add('无备注'); // 如果输入框为空，则保存“无备注”
+                    _locationNotes.add('无备注');
                   } else {
-                    _locationNotes.add(remark); // 否则保存输入的备注
+                    _locationNotes.add(remark);
                   }
-                  _saveLocations(); // 保存位置和备注
-                  Navigator.of(context).pop(); // 关闭对话框
-                  _showSuccessDialog(); // 显示保存成功提示
+                  _saveLocations();
+                  Navigator.of(context).pop();
+                  _showSuccessDialog();
                 });
               },
               child: const Text('保存'),
@@ -197,7 +197,9 @@ class _MapPageState extends State<MapPage> {
         double? longitude = double.tryParse(event['longitude'].toString());
         meLatitude = latitude;
         meLongitude = longitude;
+        if(meLongitude != null && _firstTimeIn) _changeCameraPosition(LatLng(meLatitude!, meLongitude!));
         if (latitude != null && longitude != null) {
+          _firstTimeIn = false; //首次失效
           setState(() {
             currentLocation = CameraPosition(
               target: LatLng(latitude, longitude),

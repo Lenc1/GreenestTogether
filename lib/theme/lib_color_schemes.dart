@@ -29,7 +29,7 @@ class MaterialTheme {
       onSurface: Color(0xFF2F2E33),
       onSurfaceVariant: Color(4282337850),
       outline: Color(4285496169),
-      outlineVariant: Color(4290693814),
+      outlineVariant: Color(4294967295),
       shadow: Color(4278190080),
       scrim: Color(4278190080),
       inverseSurface: Color(4281086505),
@@ -46,12 +46,12 @@ class MaterialTheme {
       onTertiaryFixed: Color(4278197805),
       tertiaryFixedDim: Color(4286566655),
       onTertiaryFixedVariant: Color(4278209642),
-      surfaceDim: Color(4292205774),
+      surfaceDim: Color(4294967295),
       surfaceBright: Color(4294967295),
       surfaceContainerLowest: Color(4294967295),
       surfaceContainerLow: Color(4293916391),
       surfaceContainer: Color(4293521633),
-      surfaceContainerHigh: Color(4293192412),
+      surfaceContainerHigh: Color(4294967295),
       surfaceContainerHighest: Color(4292797910),
     );
   }
