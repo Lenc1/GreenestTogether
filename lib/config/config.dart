@@ -10,7 +10,7 @@ class ConstConfig {
   static const androidKey = '41f745929d2efa365f1a965b19c04c8d';
 
   /// 苹果key
-  static const iosKey = '设置你的苹果key';
+  static const iosKey = '';
 
   /// web服务
   static const webKey = 'f4af285e3c44eff88ab71d535d8c863a';

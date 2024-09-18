@@ -17,7 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../config/global_preference.dart'; // 新增
+import '../config/global_preference.dart';
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -68,7 +68,6 @@ class _MapPageState extends State<MapPage> {
       });
     }
   }
-
   Future<void> _saveLocations() async { //保存位置
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> latitudes = _savedLocations.map((loc) => loc.latitude.toString()).toList();

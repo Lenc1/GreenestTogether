@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         } else {
           // 根据Token存在与否导航到不同页面
           return GetMaterialApp(
-            title: '净智同心',
+            title: '怀智共游',
             theme:
                 GlobalService.to.isDarkModel ? AppTheme.dark : AppTheme.light,
             home: snapshot.data == true
@@ -434,8 +434,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Obx(
                       () => Image(
                         image: GlobalService.to.isDarkModel
-                            ? const AssetImage('assets/images/Light.png')
-                            : const AssetImage('assets/images/Dark.png'),
+                            ? const AssetImage('assets/images/MEH.png')
+                            : const AssetImage('assets/images/MEH.png'),
                       ),
                     ),
                   ),
